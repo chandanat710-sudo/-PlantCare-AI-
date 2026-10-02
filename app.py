@@ -27,7 +27,7 @@ def render_messages(messages):
         if messages["kind"] == "text":
             st.markdown(messages["content"])
         elif messages["kind"] == "image":
-            st.image(messages["content"], use_container_width=True)
+            st.image(messages["content"], width="stretch")
 
 def add_message(role,kind, content):
     st.session_state.messages.append({"role": role, "kind": kind, "content": content})
@@ -78,13 +78,11 @@ if 'onboarded' not in st.session_state:
     if submit_button:
        if not user_name.strip() or not user_email.strip():
            st.error("Please enter your name and email address.")
-       else:
-          st.session_state['onboarded'] = True
-          st.success("Onboarding complete! You can now upload plant images for analysis.")    
+       else: 
           st.session_state['user_name'] = user_name
           st.session_state['user_email'] = user_email
           st.session_state['plant_type'] = plant_type     
-
+          
           st.session_state.chat = gemini_client.chats.create(
             model=MODEL_NAME,
             config=types.GenerateContentConfig(
@@ -93,17 +91,16 @@ if 'onboarded' not in st.session_state:
           st.session_state.messages = []
           st.session_state.onboarded = True   
           st.rerun()
-
+    st.stop()
 
 header_col,button_col = st.columns([5,2],vertical_alignment="center")
 
 with header_col:
     st.title(" 🌱PlantCare AI !")
-    st.caption("Your AI-powered plant health assistant. Upload a clear photo of a plant or leaf, and I’ll help you identify possible plant diseases, pests, nutrient deficiencies, and suggest practical treatment and prevention steps.")
-
+    
 with button_col:
     send_disabled = len(st.session_state.messages) <=1
-    if st.button("send to Email",disabled=send_disabled,use_container_width=True):
+    if st.button("send to Email",disabled=send_disabled,width="stretch"):
         with st.spinner("Summarizing the conversation for Email..."):
             summary = ask_gemini([SUMMARY_REQUEST_TEMPLATE])
             success,info = send_email(st.session_state.user_email,"Plantcare AI-Plant Health summary",summary)
@@ -120,11 +117,11 @@ st.caption(
 )
 
 if not st.session_state.messages:
-    add_message("assistant", "text", WELCOME_MESSAGE_TEMPLATE. format(name = st.session_state.get("user_name", "User")))
+    welcome_message= WELCOME_MESSAGE_TEMPLATE.format(name=st.session_state.get("user_name", "User"))
+    add_message("assistant", "text", welcome_message)
 
-else:
-    for message in st.session_state.messages:
-        render_messages(message)
+for message in st.session_state.messages:
+    render_messages(message)    
 
 user_input = st.chat_input("Ask a question or upload an image of your plant for analysis.",
 accept_file=True,
