@@ -68,7 +68,7 @@ if 'onboarded' not in st.session_state:
     st.title(" 🌱PlantCare AI !")
     st.caption("Your AI-powered plant health assistant. Upload a clear photo of a plant or leaf, and I’ll help you identify possible plant diseases, pests, nutrient deficiencies, and suggest practical treatment and prevention steps.")
     with st.form("onboarding_form"):
-        st.write("Please provide some information about your plant:")
+        st.write("Please provide some information:")
         user_name = st.text_input("user_name")
         user_email = st.text_input("user_email")
         plant_type = st.selectbox("Plant Type", ["Flowering Plant", "Vegetable", "Fruit Tree", "Herb", "Other"])
